@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trucks Mate – Driver Application</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Open+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#14284B; --orange:#F58220; --orange-dark:#d96d10; --ink:#4b5563;
+    --line:#9aa3b2; --track:#e8f1fa; --bar:#12a8e0; --bg:#ffffff;
+    --err:#b42318;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --bg:#0e1a30; --ink:#cdd6e6; --line:#5b6b88; --track:#1c2d4d; --navy:#e9eefb; }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%}
+  body{font-family:"Open Sans",system-ui,Arial,sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;min-height:100vh}
+  header{text-align:center;padding:28px 16px 8px}
+  .brand{font-family:"Barlow Condensed",Impact,sans-serif;font-weight:800;font-size:34px;line-height:.95;color:var(--navy);letter-spacing:.5px;text-transform:uppercase}
+  .brand span{color:var(--orange)}
+  main{flex:1;width:100%;max-width:380px;margin:0 auto;padding:16px 16px 40px}
+  h1{font-size:22px;font-weight:600;line-height:1.3;margin:20px 0 14px}
+  h1 b{font-weight:800}
+  p.sub{margin:0 0 14px;font-size:17px;line-height:1.5}
+  .hint{font-style:italic;font-size:15px;margin:0 0 12px}
+  input[type=text],input[type=email],input[type=tel],select{
+    width:100%;height:44px;border:1px solid var(--line);border-radius:5px;background:transparent;
+    font:inherit;font-size:16px;color:inherit;padding:0 12px;text-align:center;margin-bottom:12px}
+  input::placeholder{font-style:italic;color:#8b94a3}
+  input:focus-visible,select:focus-visible,button:focus-visible,.back:focus-visible{outline:3px solid var(--bar);outline-offset:2px}
+  .btn{width:100%;height:48px;border:0;border-radius:5px;background:var(--orange);color:#fff;
+    font-family:"Barlow Condensed",Impact,sans-serif;font-weight:800;font-size:22px;letter-spacing:.5px;text-transform:uppercase;cursor:pointer}
+  .btn:hover{background:var(--orange-dark)}
+  .btn[disabled]{opacity:.6;cursor:wait}
+  .checks{display:flex;gap:22px;margin-bottom:22px}
+  .checks label{display:flex;align-items:center;gap:8px;cursor:pointer}
+  .checks input{width:30px;height:30px;accent-color:#5b6b88;margin:0}
+  .consent{display:flex;gap:12px;align-items:flex-start;font-size:13px;line-height:1.45;margin:0 0 16px}
+  .consent input{flex:0 0 20px;width:20px;height:20px;margin:3px 0 0}
+  .track{height:10px;border-radius:6px;background:var(--track);margin:26px 0 0;overflow:hidden}
+  .fill{height:100%;background:var(--bar);border-radius:6px;transition:width .3s}
+  .back{display:block;margin:22px auto 0;background:none;border:0;font:italic 16px "Open Sans",sans-serif;color:#8b94a3;cursor:pointer}
+  .error{color:var(--err);font-size:14px;min-height:20px;margin:-4px 0 8px;text-align:center}
+  .step{display:none}
+  .step.on{display:block}
+  .done{text-align:center}
+  .done .tick{width:64px;height:64px;border-radius:50%;background:var(--orange);color:#fff;font-size:34px;display:grid;place-items:center;margin:18px auto}
+  footer{background:#14284B;color:#fff;text-align:center;padding:26px 16px;font-size:14px}
+  footer a{color:#fff;text-decoration:none}
+  .file{display:block;border:1.5px dashed var(--line);border-radius:6px;padding:14px 12px;margin-bottom:12px;cursor:pointer;text-align:center}
+  .file:hover{border-color:var(--orange)}
+  .file input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+  .file:focus-within{outline:3px solid var(--bar);outline-offset:2px}
+  .file .ft{display:block;font-weight:600;color:var(--navy);margin-bottom:4px}
+  .file .fn{display:block;font-size:14px;word-break:break-all}
+  .file.has{border-style:solid;border-color:#12a05c}
+  .hp{position:absolute;left:-9999px;opacity:0}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Trucks<span>Mate</span></div>
+</header>
+
+<main>
+  <form id="f" novalidate>
+    <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off">
+
+    <!-- 1 -->
+    <section class="step on" data-step="0">
+      <h1>Let Your Next Job Find <b>You</b>!</h1>
+      <p class="sub">Complete the 30 second application &amp; start getting job offers.</p>
+      <p class="sub">Enter your zip code to get started.</p>
+      <input type="text" name="zip" inputmode="numeric" maxlength="10" placeholder="Zip Code" autocomplete="postal-code" aria-label="Zip code">
+      <div class="error" role="alert"></div>
+      <button type="button" class="btn next">Get started!</button>
+    </section>
+
+    <!-- 2 -->
+    <section class="step" data-step="1">
+      <h1>What is your <b>CDL experience</b>?</h1>
+      <select name="cdl_experience" aria-label="CDL-A experience">
+        <option value="">Please select…</option>
+        <option>I need CDL training</option>
+        <option>In CDL school now</option>
+        <option>CDL grad, no experience</option>
+        <option>1-5 months</option>
+        <option>6-11 months</option>
+        <option>1 year</option>
+        <option>2 years</option>
+        <option>3 years</option>
+        <option>4 years</option>
+        <option>5+ years</option>
+      </select>
+      <div class="error" role="alert"></div>
+      <button type="button" class="btn next">Next ›</button>
+    </section>
+
+    <!-- 3 -->
+    <section class="step" data-step="2">
+      <h1>Please select <b>all</b> of your current, valid driver's licenses.</h1>
+      <p class="hint">Select all that apply.</p>
+      <div class="checks">
+        <label><input type="checkbox" name="licenses" value="CDL A"> CDL A</label>
+        <label><input type="checkbox" name="licenses" value="CDL B"> CDL B</label>
+        <label><input type="checkbox" name="licenses" value="CDL C"> CDL C</label>
+        <label><input type="checkbox" name="licenses" value="CDL R"> CDL R</label>
+      </div>
+      <div class="error" role="alert"></div>
+      <button type="button" class="btn next">Next ›</button>
+    </section>
+
+    <!-- 4 -->
+    <section class="step" data-step="3">
+      <h1>How many verifiable months have you driven professionally with your CDL-A in the last 3 years?</h1>
+      <select name="months_driven" aria-label="Months driven in last 3 years">
+        <option value="">Please select…</option>
+        <option>None</option>
+        <option>1-5 months</option>
+        <option>6-11 months</option>
+        <option>1 year</option>
+        <option>2+ years</option>
+      </select>
+      <div class="error" role="alert"></div>
+      <button type="button" class="btn next">Next ›</button>
+    </section>
+
+    <!-- 5 -->
+    <section class="step" data-step="4">
+      <h1>What is your <b>first and last name</b>?</h1>
+      <input type="text" name="name" placeholder="First and Last Name" autocomplete="name" aria-label="Full name">
+      <div class="error" role="alert"></div>
+      <button type="button" class="btn next">Next ›</button>
+    </section>
+
+    <!-- 6 -->
+    <section class="step" data-step="5">
+      <h1>What is your <b>email</b>?</h1>
+      <input type="email" name="email" placeholder="Email" autocomplete="email" aria-label="Email">
+      <div class="error" role="alert"></div>
+      <button type="button" class="btn next">Next ›</button>
+    </section>
+
+    <!-- 7 uploads -->
+    <section class="step" data-step="6">
+      <h1>Upload your <b>documents</b></h1>
+      <p class="hint">Clear photo or PDF. Max 5 MB each.</p>
+      <label class="file" for="f_dl">
+        <span class="ft">Driver license</span>
+        <span class="fn" id="n_dl">Tap to choose a photo or PDF</span>
+        <input id="f_dl" type="file" name="driver_license" accept="image/*,.pdf">
+      </label>
+      <label class="file" for="f_med">
+        <span class="ft">DOT medical card</span>
+        <span class="fn" id="n_med">Tap to choose a photo or PDF</span>
+        <input id="f_med" type="file" name="dot_medical" accept="image/*,.pdf">
+      </label>
+      <div class="error" role="alert"></div>
+      <button type="button" class="btn next">Next ›</button>
+    </section>
+
+    <!-- 8 phone -->
+    <section class="step" data-step="7">
+      <h1>What is your <b>phone number</b>?</h1>
+      <p class="sub">Please provide the best number to reach you with load offers.</p>
+      <input type="tel" name="phone" placeholder="Phone" autocomplete="tel" aria-label="Phone">
+      <label class="consent">
+        <input type="checkbox" name="consent_terms" value="yes">
+        <span>By checking this box and clicking "Agree and Submit" I confirm that I am 18+ years of age, and I agree to be contacted by email by Trucks Mate Logistics about loads and dispatch services.</span>
+      </label>
+      <label class="consent">
+        <input type="checkbox" name="consent_phone" value="yes">
+        <span>I give my express consent for Trucks Mate Logistics to contact me by telephone, call or text message, at the number provided above. I understand my consent is not required to get load offers.</span>
+      </label>
+      <div class="error" role="alert"></div>
+      <button type="submit" class="btn" id="submit">Agree and submit ›</button>
+    </section>
+
+    <!-- Thank you -->
+    <section class="step done" data-step="8">
+      <div class="tick" aria-hidden="true">✓</div>
+      <h1>Application received!</h1>
+      <p class="sub">Thank you. A Trucks Mate dispatcher will reach out to you shortly.</p>
+    </section>
+
+    <div id="progress" aria-hidden="true">
+      <div class="track"><div class="fill" id="fill" style="width:6%"></div></div>
+      <button type="button" class="back" id="back" style="display:none">&lt; go back</button>
+    </div>
+  </form>
+</main>
+
+<footer>
+  <a href="#">Privacy</a> | <a href="#">Terms</a> | <a href="#">Cookie Policy</a>
+  <div style="margin-top:10px">Copyright © <span id="yr"></span> Trucks Mate Logistics</div>
+</footer>
+
+<script>
+(function(){
+  var form = document.getElementById('f');
+  var steps = Array.prototype.slice.call(form.querySelectorAll('.step'));
+  var fill = document.getElementById('fill');
+  var back = document.getElementById('back');
+  var progress = document.getElementById('progress');
+  // Yahan apna email likhein jahan applications chahiye
+  var EMAIL = 'YOUR_EMAIL@example.com';
+  var cur = 0, LAST = 7;
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  function show(i){
+    cur = i;
+    steps.forEach(function(s, n){ s.classList.toggle('on', n === i); });
+    fill.style.width = Math.max(6, Math.round((i / (LAST + 1)) * 100)) + '%';
+    back.style.display = (i > 0 && i <= LAST) ? 'block' : 'none';
+    if (i > LAST) progress.style.display = 'none';
+    var inp = steps[i].querySelector('input[type=text],input[type=email],input[type=tel],select');
+    if (inp) inp.focus({preventScroll:true});
+    window.scrollTo({top:0});
+  }
+  function setErr(msg){ steps[cur].querySelector('.error').textContent = msg || ''; return !msg; }
+  function val(name){ return (form.elements[name].value || '').trim(); }
+
+  function validate(i){
+    switch(i){
+      case 0: return setErr(/^\d{5}(-\d{4})?$/.test(val('zip')) ? '' : 'Enter a valid 5-digit zip code.');
+      case 1: return setErr(val('cdl_experience') ? '' : 'Please choose your CDL experience.');
+      case 2: return setErr(form.querySelectorAll('input[name=licenses]:checked').length ? '' : 'Select at least one license.');
+      case 3: return setErr(val('months_driven') ? '' : 'Please choose an option.');
+      case 4: return setErr(/\S+\s+\S+/.test(val('name')) ? '' : 'Enter your first and last name.');
+      case 5: return setErr(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val('email')) ? '' : 'Enter a valid email address.');
+      case 6:
+        if (!form.elements.driver_license.files.length) return setErr('Please upload your driver license.');
+        if (!form.elements.dot_medical.files.length) return setErr('Please upload your DOT medical card.');
+        return setErr('');
+      case 7:
+        if (val('phone').replace(/\D/g,'').length < 10) return setErr('Enter a valid phone number.');
+        if (!form.elements.consent_terms.checked) return setErr('Please accept the first consent box to continue.');
+        return setErr('');
+    }
+    return true;
+  }
+
+  [['driver_license','n_dl'],['dot_medical','n_med']].forEach(function(p){
+    var inp = form.elements[p[0]];
+    inp.addEventListener('change', function(){
+      var f = inp.files[0], lab = inp.parentNode;
+      if (f && ((f.type === 'application/pdf' && f.size > 5 * 1024 * 1024) || f.size > 25 * 1024 * 1024)){ inp.value=''; f = null; setErr('File is too large (max 5 MB for PDF). Choose a smaller file or a photo.'); }
+      else setErr('');
+      document.getElementById(p[1]).textContent = f ? f.name : 'Tap to choose a photo or PDF';
+      lab.classList.toggle('has', !!f);
+    });
+  });
+
+  // Shrink phone photos so the email stays under the size limit
+  function prepare(file){
+    return new Promise(function(resolve, reject){
+      if (!file) return resolve(null);
+      if (file.type === 'application/pdf'){
+        return file.size > 5*1024*1024 ? reject(new Error('PDF too large (max 5 MB): ' + file.name)) : resolve(file);
+      }
+      var img = new Image(), url = URL.createObjectURL(file);
+      img.onload = function(){
+        var max = 1600, r = Math.min(1, max / Math.max(img.width, img.height));
+        var c = document.createElement('canvas');
+        c.width = Math.round(img.width * r); c.height = Math.round(img.height * r);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        c.toBlob(function(b){
+          URL.revokeObjectURL(url);
+          if (!b) return reject(new Error('Could not read image'));
+          resolve(new File([b], file.name.replace(/\.[^.]+$/, '') + '.jpg', {type:'image/jpeg'}));
+        }, 'image/jpeg', 0.8);
+      };
+      img.onerror = function(){ URL.revokeObjectURL(url); reject(new Error('Unsupported image file: ' + file.name)); };
+      img.src = url;
+    });
+  }
+
+  form.addEventListener('click', function(e){
+    if (e.target.classList.contains('next') && validate(cur)) show(cur + 1);
+  });
+  back.addEventListener('click', function(){ if (cur > 0) show(cur - 1); });
+  form.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' && e.target.tagName !== 'BUTTON' && cur < LAST){
+      e.preventDefault();
+      if (validate(cur)) show(cur + 1);
+    }
+  });
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if (!validate(LAST)) return;
+    var btn = document.getElementById('submit');
+    btn.disabled = true; btn.textContent = 'Sending…';
+
+    var fd = new FormData();
+    fd.append('_subject', 'New Driver Application - Trucks Mate Logistics');
+    fd.append('_captcha', 'false');
+    fd.append('_template', 'table');
+    fd.append('_honey', form.elements.botcheck.checked ? 'bot' : '');
+    fd.append('Name', val('name'));
+    fd.append('Email', val('email'));
+    fd.append('Phone', val('phone'));
+    fd.append('Zip', val('zip'));
+    fd.append('CDL-A experience', val('cdl_experience'));
+    fd.append('Licenses', Array.prototype.map.call(form.querySelectorAll('input[name=licenses]:checked'), function(c){return c.value;}).join(', '));
+    fd.append('Months driven (last 3 yrs)', val('months_driven'));
+    fd.append('Agreed to email contact', form.elements.consent_terms.checked ? 'Yes' : 'No');
+    fd.append('Agreed to call/text contact', form.elements.consent_phone.checked ? 'Yes' : 'No');
+    fd.append('Submitted at', new Date().toString());
+
+    Promise.all([prepare(form.elements.driver_license.files[0]), prepare(form.elements.dot_medical.files[0])])
+    .then(function(files){
+      fd.append('Driver License', files[0]);
+      fd.append('DOT Medical Card', files[1]);
+      return fetch('https://formsubmit.co/ajax/' + EMAIL, {method:'POST', headers:{'Accept':'application/json'}, body: fd});
+    }).then(function(r){ return r.json(); }).then(function(res){
+      if (res.success === true || res.success === 'true') { show(LAST + 1); }
+      else { throw new Error(res.message || 'Failed'); }
+    }).catch(function(err){
+      btn.disabled = false; btn.textContent = 'Agree and submit ›';
+      setErr(err && /too large|Unsupported/.test(err.message) ? err.message : 'Could not send your application. Check your connection and try again.');
+    });
+  });
+})();
+</script>
+</body>
+</html>
