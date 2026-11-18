@@ -166,15 +166,15 @@
     <!-- 8 phone -->
     <section class="step" data-step="7">
       <h1>What is your <b>phone number</b>?</h1>
-      <p class="sub">Please provide the best number to reach you with load offers.</p>
+      <p class="sub">Please provide the best number to reach you.</p>
       <input type="tel" name="phone" placeholder="Phone" autocomplete="tel" aria-label="Phone">
       <label class="consent">
         <input type="checkbox" name="consent_terms" value="yes">
-        <span>By checking this box and clicking "Agree and Submit" I confirm that I am 18+ years of age, and I agree to be contacted by email by Trucks Mate Logistics about loads and dispatch services.</span>
+        <span>By checking this box and clicking "Agree and Submit" I confirm that I am 18+ years of age, and I agree to be contacted by email by Trucks Mate Team about our Job.</span>
       </label>
       <label class="consent">
         <input type="checkbox" name="consent_phone" value="yes">
-        <span>I give my express consent for Trucks Mate Logistics to contact me by telephone, call or text message, at the number provided above. I understand my consent is not required to get load offers.</span>
+        <span>I give my express consent for Trucks Mate Team to contact me by telephone, call or text message, at the number provided above. I understand my consent is not required to get offers.</span>
       </label>
       <div class="error" role="alert"></div>
       <button type="submit" class="btn" id="submit">Agree and submit ›</button>
@@ -184,7 +184,7 @@
     <section class="step done" data-step="8">
       <div class="tick" aria-hidden="true">✓</div>
       <h1>Application received!</h1>
-      <p class="sub">Thank you. A Trucks Mate dispatcher will reach out to you shortly.</p>
+      <p class="sub">Thank you. A Trucks Mate Owner will reach out to you shortly.</p>
     </section>
 
     <div id="progress" aria-hidden="true">
@@ -196,7 +196,7 @@
 
 <footer>
   <a href="#">Privacy</a> | <a href="#">Terms</a> | <a href="#">Cookie Policy</a>
-  <div style="margin-top:10px">Copyright © <span id="yr"></span> Trucks Mate Logistics</div>
+  <div style="margin-top:10px">Copyright © <span id="yr"></span> Trucks Mate</div>
 </footer>
 
 <script>
@@ -207,7 +207,11 @@
   var back = document.getElementById('back');
   var progress = document.getElementById('progress');
   // Yahan apna email likhein jahan applications chahiye
-  var EMAIL = 'YOUR_EMAIL@example.com';
+  var EMAIL = 'david1trucksmate@gmail.com';
+  // 'formsubmit' = free, documents email me attach ho jate hain (default)
+  // 'web3forms'  = Web3Forms key use hogi. Free plan par documents attach NAHI hote (Pro plan chahiye)
+  var PROVIDER = 'formsubmit';
+  var W3F_KEY = 'cd7334fb-2aa8-4260-9265-3bec125b50b5';
   var cur = 0, LAST = 7;
   document.getElementById('yr').textContent = new Date().getFullYear();
 
@@ -297,7 +301,7 @@
     btn.disabled = true; btn.textContent = 'Sending…';
 
     var fd = new FormData();
-    fd.append('_subject', 'New Driver Application - Trucks Mate Logistics');
+    fd.append('_subject', 'New Driver Application - Trucks Mate');
     fd.append('_captcha', 'false');
     fd.append('_template', 'table');
     fd.append('_honey', form.elements.botcheck.checked ? 'bot' : '');
@@ -316,7 +320,14 @@
     .then(function(files){
       fd.append('Driver License', files[0]);
       fd.append('DOT Medical Card', files[1]);
-      return fetch('https://formsubmit.co/ajax/' + EMAIL, {method:'POST', headers:{'Accept':'application/json'}, body: fd});
+      var url = 'https://formsubmit.co/ajax/' + EMAIL;
+      if (PROVIDER === 'web3forms'){
+        url = 'https://api.web3forms.com/submit';
+        fd.append('access_key', W3F_KEY);
+        fd.append('subject', 'New Driver Application - Trucks Mate');
+        fd.append('from_name', 'Trucks Mate Website');
+      }
+      return fetch(url, {method:'POST', headers:{'Accept':'application/json'}, body: fd});
     }).then(function(r){ return r.json(); }).then(function(res){
       if (res.success === true || res.success === 'true') { show(LAST + 1); }
       else { throw new Error(res.message || 'Failed'); }
